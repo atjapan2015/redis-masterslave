@@ -140,7 +140,7 @@ resource "null_resource" "redis_master_start_sentinel" {
   }
 }
 
-resource "null_resource" "redis_master_register_grafana" {
+resource "null_resource" "redis_master_register_grafana_insight" {
   depends_on = [null_resource.redis_master_create_cluster, null_resource.redis_master_start_sentinel]
   provisioner "remote-exec" {
     connection {
@@ -154,7 +154,9 @@ resource "null_resource" "redis_master_register_grafana" {
     }
     inline = [
       "echo '=== Register REDIS Datasource to Grafana... ==='",
-      "curl -d '{\"name\":\"${var.redis_prefix}\",\"type\":\"redis-datasource\",\"typeName\":\"Redis\",\"typeLogoUrl\":\"public/plugins/redis-datasource/img/logo.svg\",\"access\":\"proxy\",\"url\":\"redis://${data.oci_core_vnic.redis_master_vnic[0].private_ip_address}:${var.sentinel_port}\",\"password\":\"\",\"user\":\"\",\"database\":\"\",\"basicAuth\":false,\"isDefault\":false,\"jsonData\":{\"client\":\"sentinel\",\"sentinelAcl\":false,\"sentinelName\":\"${data.oci_core_vnic.redis_master_vnic[0].hostname_label}.${var.redis_prefix}.${var.redis_prefix}.${var.redis_domain}\"},\"secureJsonData\":{\"password\":\"${random_string.redis_password.result}\"},\"readOnly\":false}' -H \"Content-Type: application/json\" -X POST http://admin:${var.global_password}@redismanager:3000/api/datasources"
+      "curl -d '{\"name\":\"${var.redis_prefix}\",\"type\":\"redis-datasource\",\"typeName\":\"Redis\",\"typeLogoUrl\":\"public/plugins/redis-datasource/img/logo.svg\",\"access\":\"proxy\",\"url\":\"redis://${data.oci_core_vnic.redis_master_vnic[0].private_ip_address}:${var.sentinel_port}\",\"password\":\"\",\"user\":\"\",\"database\":\"\",\"basicAuth\":false,\"isDefault\":false,\"jsonData\":{\"client\":\"sentinel\",\"sentinelAcl\":false,\"sentinelName\":\"${data.oci_core_vnic.redis_master_vnic[0].hostname_label}.${var.redis_prefix}.${var.redis_prefix}.${var.redis_domain}\"},\"secureJsonData\":{\"password\":\"${random_string.redis_password.result}\"},\"readOnly\":false}' -H \"Content-Type: application/json\" -X POST http://admin:${var.global_password}@redismanager:3000/api/datasources",
+      "echo '=== Register REDIS Datasource to Redis Insight... ==='",
+      "curl -d '{\"name\":\"${var.redis_prefix}\",\"connectionType\":\"STANDALONE\",\"host\":\"${data.oci_core_vnic.redis_master_vnic[0].private_ip_address}\",\"port\":${var.sentinel_port},\"password\":\"${random_string.redis_password.result}\"}' -H \"Content-Type: application/json\" -X POST http://redismanager:8001/api/instance/"
     ]
   }
 }
