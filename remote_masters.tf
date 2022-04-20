@@ -2,7 +2,7 @@
 ## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
 
 resource "null_resource" "redis_master_bootstrap" {
-  depends_on = [oci_core_instance.redis_master, oci_core_instance.redis_replica]
+  depends_on = [oci_core_instance.redis_master]
   count      = var.redis_master_count
   provisioner "file" {
     connection {
@@ -31,7 +31,7 @@ resource "null_resource" "redis_master_bootstrap" {
       "chmod +x ~/redis_bootstrap_master.sh",
       "sudo ~/redis_bootstrap_master.sh",
       "sudo chmod 777 /etc/redis.conf",
-      "if [[ ${var.is_redis_cluster} != true ]] && [[ `hostname -s` != '${data.oci_core_vnic.redis_master_vnic[0].hostname_label}' ]]; then echo 'slaveof ${data.oci_core_vnic.redis_master_vnic[0].private_ip_address} 6379' >> /etc/redis.conf; fi",
+      "if [[ ${var.is_redis_cluster} != true ]] && [[ `hostname -s` != '${data.oci_core_vnic.redis_master_vnic[0].hostname_label}' ]]; then echo 'slaveof ${data.oci_core_vnic.redis_master_vnic[0].private_ip_address} ${var.redis_port1}' >> /etc/redis.conf; fi",
       "sudo chmod 644 /etc/redis.conf"
     ]
   }

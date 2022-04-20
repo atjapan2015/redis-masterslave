@@ -63,7 +63,7 @@ resource "null_resource" "redis_master_master_list" {
     inline = [
       "echo '=== Starting Create Master List on redis0 node... ==='",
       "sleep 10",
-      "echo -n '${data.oci_core_vnic.redis_master_vnic[count.index].public_ip_address}:6379 ' >> /home/opc/master_list.sh",
+      "echo -n '${data.oci_core_vnic.redis_master_vnic[count.index].public_ip_address}:${var.redis_port1} ' >> /home/opc/master_list.sh",
       "echo '=== Started Create Master List on redis0 node... ==='"
     ]
   }
@@ -133,7 +133,9 @@ resource "null_resource" "redis_master_start_sentinel" {
       "sudo systemctl start redis-sentinel.service",
       "sleep 5",
       "sudo systemctl status redis-sentinel.service",
-      "echo '=== Started REDIS SENTINEL on redis${count.index} node... ==='"
+      "echo '=== Started REDIS SENTINEL on redis${count.index} node... ==='",
+      "echo '=== Register REDIS Datasource to Grafana... ==='",
+      "curl -d '{\"name\":\"${var.redis_prefix}\",\"type\":\"redis-datasource\",\"typeName\":\"Redis\",\"typeLogoUrl\":\"public/plugins/redis-datasource/img/logo.svg\",\"access\":\"proxy\",\"url\":\"redis://${data.oci_core_vnic.redis_master_vnic[0].private_ip_address}:${var.sentinel_port}\",\"password\":\"\",\"user\":\"\",\"database\":\"\",\"basicAuth\":false,\"isDefault\":false,\"jsonData\":{\"client\":\"sentinel\",\"sentinelAcl\":false,\"sentinelName\":\"${data.oci_core_vnic.redis_master_vnic[0].hostname_label}.${var.redis_prefix}.${var.redis_prefix}.${var.redis_domain}\"},\"secureJsonData\":{\"password\":\"${random_string.redis_password.result}\"},\"readOnly\":false}' -H \"Content-Type: application/json\" -X POST http://admin:${var.global_password}@redismanager:3000/api/datasources"
     ]
   }
 }
@@ -152,7 +154,7 @@ resource "null_resource" "redis_master_register_grafana" {
     }
     inline = [
       "echo '=== Register REDIS Datasource to Grafana... ==='",
-      "curl -d '{\"name\":\"Redis\",\"type\":\"redis-datasource\",\"typeName\":\"Redis\",\"typeLogoUrl\":\"public/plugins/redis-datasource/img/logo.svg\",\"access\":\"proxy\",\"url\":\"redis://${data.oci_core_vnic.redis_master_vnic[0].private_ip_address}:6379\",\"password\":\"\",\"user\":\"\",\"database\":\"\",\"basicAuth\":false,\"isDefault\":false,\"jsonData\":{\"client\":\"cluster\"},\"secureJsonData\":{\"password\":\"${random_string.redis_password.result}\"},\"readOnly\":false}' -H \"Content-Type: application/json\" -X POST http://admin:${var.global_password}@redismanager:3000/api/datasources"
+      "curl -d '{\"name\":\"${var.redis_prefix}\",\"type\":\"redis-datasource\",\"typeName\":\"Redis\",\"typeLogoUrl\":\"public/plugins/redis-datasource/img/logo.svg\",\"access\":\"proxy\",\"url\":\"redis://${data.oci_core_vnic.redis_master_vnic[0].private_ip_address}:${var.sentinel_port}\",\"password\":\"\",\"user\":\"\",\"database\":\"\",\"basicAuth\":false,\"isDefault\":false,\"jsonData\":{\"client\":\"sentinel\",\"sentinelAcl\":false,\"sentinelName\":\"${data.oci_core_vnic.redis_master_vnic[0].hostname_label}.${var.redis_prefix}.${var.redis_prefix}.${var.redis_domain}\"},\"secureJsonData\":{\"password\":\"${random_string.redis_password.result}\"},\"readOnly\":false}' -H \"Content-Type: application/json\" -X POST http://admin:${var.global_password}@redismanager:3000/api/datasources"
     ]
   }
 }
