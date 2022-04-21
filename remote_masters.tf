@@ -31,7 +31,7 @@ resource "null_resource" "redis_master_bootstrap" {
       "chmod +x ~/redis_bootstrap_master.sh",
       "sudo ~/redis_bootstrap_master.sh",
       "sudo chmod 777 /etc/redis.conf",
-      "if [[ ${var.is_redis_cluster} != true ]] && [[ `hostname -s` != '${data.oci_core_vnic.redis_master_vnic[0].hostname_label}' ]]; then echo 'slaveof ${data.oci_core_vnic.redis_master_vnic[0].private_ip_address} ${var.redis_port1}' >> /etc/redis.conf; fi",
+      "if [[ ${var.is_redis_cluster} != true ]] && [[ `hostname -s` != '${data.oci_core_vnic.redis_master_vnic[0].hostname_label}' ]]; then echo 'slaveof ${data.oci_core_vnic.redis_master_vnic[0].public_ip_address} ${var.redis_port1}' >> /etc/redis.conf; fi",
       "sudo chmod 644 /etc/redis.conf"
     ]
   }

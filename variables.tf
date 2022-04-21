@@ -18,13 +18,13 @@ variable "redis_master_count" {
 variable "redis_replica_count" {
   description = "Number of redis cluster replicas, availabe value are 0,1,2"
   type        = number
-  default     = 1
+  default     = 0
 }
 
 variable "is_redis_cluster" {
   description = "true for redis cluster, false for master-slave"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "release" {
@@ -62,6 +62,18 @@ variable "redis_port2" {
 
 variable "sentinel_port" {
   default = "26379"
+}
+
+variable "redis_config_is_use_rdb" {
+  description = "true for use rdb, false for not use rdb"
+  type        = bool
+  default     = true
+}
+
+variable "redis_config_is_use_aof" {
+  description = "true for use aof, false for not use aof"
+  type        = bool
+  default     = false
 }
 
 variable "ssh_public_key" {
