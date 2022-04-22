@@ -80,20 +80,22 @@ dir "/tmp"
 pidfile "/var/run/redis/sentinel.pid"
 protected-mode no
 sentinel deny-scripts-reconfig yes
+%{ for i in range(1) ~}
 sentinel monitor ${master_fqdn[0]}.${redis_domain} ${master_private_ips[0]} ${redis_port1} 2
 sentinel down-after-milliseconds ${master_fqdn[0]}.${redis_domain} 60000
 sentinel failover-timeout ${master_fqdn[0]}.${redis_domain} 180000
 sentinel auth-pass ${master_fqdn[0]}.${redis_domain} ${redis_password}
 sentinel parallel-syncs ${master_fqdn[0]}.${redis_domain} 1
+%{ endfor ~}
 EOF
 
-cat << EOF > /etc/systemd/system/redis-sentinel.service
+cat << EOF > /etc/systemd/system/sentinel.service
 [Unit]
 Description=Redis
 
 [Service]
 User=root
-ExecStart=/usr/local/bin/redis-sentinel /etc/sentinel.conf
+ExecStart=/usr/local/bin/sentinel /etc/sentinel.conf
 Restart=always
 
 [Install]

@@ -70,10 +70,10 @@ resource "null_resource" "redis_master_start_sentinel_masterslave" {
     }
     inline = [
       "echo '=== Starting REDIS SENTINEL on redis${count.index} node... ==='",
-      "sudo systemctl enable redis-sentinel.service",
-      "sudo systemctl start redis-sentinel.service",
+      "sudo systemctl enable sentinel.service",
+      "sudo systemctl start sentinel.service",
       "sleep 5",
-      "sudo systemctl status redis-sentinel.service",
+      "sudo systemctl status sentinel.service",
       "echo '=== Started REDIS SENTINEL on redis${count.index} node... ==='"
     ]
   }
@@ -94,10 +94,10 @@ resource "null_resource" "redis_replica_start_sentinel_masterslave" {
     }
     inline = [
       "echo '=== Starting REDIS SENTINEL on redis${count.index + var.redis_masterslave_master_count} node... ==='",
-      "sudo systemctl enable redis-sentinel.service",
-      "sudo systemctl start redis-sentinel.service",
+      "sudo systemctl enable sentinel.service",
+      "sudo systemctl start sentinel.service",
       "sleep 5",
-      "sudo systemctl status redis-sentinel.service",
+      "sudo systemctl status sentinel.service",
       "echo '=== Started REDIS SENTINEL on redis${count.index + var.redis_masterslave_master_count} node... ==='"
     ]
   }
