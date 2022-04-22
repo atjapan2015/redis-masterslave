@@ -2,7 +2,7 @@
 ## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
 
 resource "oci_core_instance" "redis_replica" {
-  count               = var.redis_replica_count * (var.is_redis_cluster ? var.redis_master_count : 0)
+  count               = var.redis_replica_count * var.redis_master_count
   availability_domain = var.availablity_domain_name
   fault_domain        = "FAULT-DOMAIN-${(count.index+2)%3+1}"
   compartment_id      = var.compartment_ocid
@@ -33,7 +33,6 @@ resource "oci_core_instance" "redis_replica" {
     user_data           = data.template_cloudinit_config.cloud_init.rendered
   }
 
-  defined_tags = {
-    "${var.redis_manager_tag_namespace_name}.${data.oci_identity_tag.redis_manager_tag.name}" = var.release
-  }
+  freeform_tags = var.tag_value.freeformTags
+  defined_tags  = var.tag_value.definedTags
 }

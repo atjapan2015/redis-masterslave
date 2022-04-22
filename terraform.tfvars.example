@@ -13,8 +13,5 @@ redis_version = "5.0.9"
 redis_config_is_use_rdb = true
 redis_config_is_use_aof = false
 
-redis_manager_tag_namespace_name = "ToDO"
-redis_manager_tag_namespace_id = "ToDO"
-redis_manager_tag_name = "release"
 virtual_network_redis_vcn_id = "ToDO"
 subnet_redis_subnet_id = "ToDO"

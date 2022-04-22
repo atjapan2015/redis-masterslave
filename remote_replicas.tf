@@ -3,7 +3,7 @@
 
 resource "null_resource" "redis_replica_bootstrap" {
   depends_on = [oci_core_instance.redis_master, oci_core_instance.redis_replica]
-  count = var.redis_replica_count * (var.is_redis_cluster ? var.redis_master_count : 0)
+  count = var.redis_replica_count * var.redis_master_count
   provisioner "file" {
     connection {
       type        = "ssh"
@@ -30,6 +30,9 @@ resource "null_resource" "redis_replica_bootstrap" {
     inline = [
       "chmod +x ~/redis_bootstrap_replica.sh",
       "sudo ~/redis_bootstrap_replica.sh",
+      "sudo chmod 777 /etc/redis.conf",
+      "if [[ ${var.is_redis_cluster} != true ]] && [[ `hostname -s` != '${data.oci_core_vnic.redis_master_vnic[0].hostname_label}' ]]; then echo 'slaveof ${data.oci_core_vnic.redis_master_vnic[0].public_ip_address} ${var.redis_port1}' >> /etc/redis.conf; fi",
+      "sudo chmod 644 /etc/redis.conf",
       "if [[ ${var.redis_config_is_use_rdb} == true ]] ; then sudo crontab /u01/redis_backup_tools/redis_rdb_copy_hourly_daily.cron; fi"
     ]
   }

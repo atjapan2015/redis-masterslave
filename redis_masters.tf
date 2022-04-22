@@ -34,8 +34,7 @@ resource "oci_core_instance" "redis_master" {
     user_data           = data.template_cloudinit_config.cloud_init.rendered
   }
 
-  defined_tags = {
-    "${var.redis_manager_tag_namespace_name}.${data.oci_identity_tag.redis_manager_tag.name}" = var.release
-  }
+  freeform_tags = var.tag_value.freeformTags
+  defined_tags  = var.tag_value.definedTags
 }
 

@@ -1,8 +1,8 @@
 ## Copyright © 2020, Oracle and/or its affiliates. 
 ## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
 
-title: "Create number of nodes deployment of a Redis Master Slave on Oracle Cloud Infrastructure Compute instances"
-stackDescription: "Deploy number of nodes deployment of a Redis Master Slave on Oracle Cloud Infrastructure Compute instances to take advantage of in-memory data structure store that is used as a database, cache, and message broker."
+title: "Create number of nodes deployment of a Redis Master Slave Architecture on Oracle Cloud Infrastructure Compute instances"
+stackDescription: "Deploy number of nodes deployment of a Redis Master Slave Architecture on Oracle Cloud Infrastructure Compute instances to take advantage of in-memory data structure store that is used as a database, cache, and message broker."
 schemaVersion: 1.1.0
 version: "20220422"
 locale: "en"
@@ -75,7 +75,7 @@ variableGroups:
     and:
       - show_advanced
   variables:
-    - redis_manager_tag_namespace_id
+    - tag_value
 
 variables:
 
@@ -289,11 +289,11 @@ variables:
       and:
         - or:
           - eq:
-            - instance_shape
-            - "VM.Standard.E3.Flex"
-          - eq:
             - instance_shape 
             - "VM.Standard.E4.Flex"
+          - eq:
+            - instance_shape
+            - "VM.Standard3.Flex"
 
   instance_flex_shape_memory:
     type: number
@@ -308,11 +308,11 @@ variables:
       and:
         - or:
           - eq:
-            - instance_shape 
-            - "VM.Standard.E3.Flex"
+            - instance_shape
+            - "VM.Standard.E4.Flex"
           - eq:
             - instance_shape 
-            - "VM.Standard.E4.Flex"
+            - "VM.Standard3.Flex"
 
   instance_os:
     type: enum
@@ -333,7 +333,7 @@ variables:
       - "7.9"
       - "7.8"
 
-  redis_manager_tag_namespace_id:
+  tag_value:
     type: oci:identity:tag:value
     required: false
     title: "Tagging"
