@@ -42,10 +42,10 @@ variableGroups:
   - sentinel_port
   - prometheus_server
   - prometheus_port
-  - grafana_user
-  - grafana_password
   - grafana_server
   - grafana_port
+  - grafana_user
+  - grafana_password
   - redis_insight_server
   - redis_insight_port
 
@@ -127,6 +127,8 @@ variables:
     description: "Choose Redis version to be deployed."  
     enum:
       - "5.0.9"
+      - "6.0.4"
+      - "6.2.5"
 
   redis_port1:
     type: number
