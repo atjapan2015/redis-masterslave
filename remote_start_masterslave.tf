@@ -30,7 +30,7 @@ resource "null_resource" "redis_master_start_redis_masterslave" {
 
 resource "null_resource" "redis_replica_start_redis_masterslave" {
   depends_on = [null_resource.redis_master_start_redis_masterslave]
-  count      = (var.redis_deployment_type == "Master Slave") ? var.redis_masterslave_replica_count * var.redis_masterslave_master_count : 0
+  count      = (var.redis_deployment_type == "Master Slave") ? var.redis_masterslave_replica_count : 0
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
@@ -55,31 +55,8 @@ resource "null_resource" "redis_replica_start_redis_masterslave" {
   }
 }
 
-resource "null_resource" "redis_master_master_list_masterslave" {
-  depends_on = [null_resource.redis_replica_start_redis_masterslave]
-  count      = (var.redis_deployment_type == "Master Slave") ? var.redis_masterslave_master_count : 0
-  provisioner "remote-exec" {
-    connection {
-      type        = "ssh"
-      user        = "opc"
-      host        = data.oci_core_vnic.redis_master_vnic[0].public_ip_address
-      private_key = tls_private_key.public_private_key_pair.private_key_pem
-      script_path = "/home/opc/myssh${count.index}.sh"
-      agent       = false
-      timeout     = "10m"
-    }
-    inline = [
-      "echo '=== Starting Create Master List on redis0 node... ==='",
-      "sleep 10",
-      "echo -n '${data.oci_core_vnic.redis_master_vnic[count.index].private_ip_address}:${var.redis_port1} ' >> /home/opc/master_list.sh",
-      "echo -n ',{\"host\":\"${data.oci_core_vnic.redis_master_vnic[count.index].private_ip_address}\",\"port\":${var.redis_port1}}' >> /home/opc/master_insight_list.sh",
-      "echo '=== Started Create Master List on redis0 node... ==='"
-    ]
-  }
-}
-
 resource "null_resource" "redis_master_start_sentinel_masterslave" {
-  depends_on = [null_resource.redis_master_master_list_masterslave]
+  depends_on = [null_resource.redis_replica_start_redis_masterslave]
   count      = (var.redis_deployment_type == "Master Slave") ? var.redis_masterslave_master_count : 0
   provisioner "remote-exec" {
     connection {
