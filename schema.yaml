@@ -27,8 +27,8 @@ variableGroups:
       and:
         - show_advanced
   variables:  
-  - VCN-CIDR
-  - Subnet-CIDR
+  - virtual_network_redis_vcn_id
+  - subnet_redis_subnet_id
   - redis_prefix
 
 - title: Redis/Sentinel Optional Configuration
@@ -111,23 +111,6 @@ variables:
     dependsOn:
       compartmentId: ${compartment_ocid}
       vcnId: ${virtual_network_redis_vcn_id}
-
-  # Optional Configuration
-  VCN-CIDR:
-    type: string
-    required: false
-    default: "10.0.0.0/16"
-    pattern: "^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\/(3[0-2]|[1-2]?[0-9])$"
-    title: "VCN CIDR"
-    description: "Choose VCN's CIDR block where Redis compute instances will be deployed."
-
-  Subnet-CIDR:
-    type: string
-    required: false
-    default: "10.0.2.0/24"
-    pattern: "^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\/(3[0-2]|[1-2]?[0-9])$"
-    title: "Subnet CIDR"
-    description: "Choose Public Subnet's CIDR where Redis compute instances will be deployed."
 
   redis_prefix:
     type: string
