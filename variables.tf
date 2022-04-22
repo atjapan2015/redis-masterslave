@@ -9,16 +9,34 @@ variable "region" {}
 variable "compartment_ocid" {}
 variable "availablity_domain_name" {}
 
-variable "redis_master_count" {
-  description = "Number of master instance, available values are [1]"
+variable "redis_standalone_master_count" {
+  description = "Number of master"
   type        = number
   default     = 1
 }
 
-variable "redis_replica_count" {
-  description = "Number of replicas instances, available values are [2]"
+variable "redis_masterslave_master_count" {
+  description = "Number of master"
+  type        = number
+  default     = 1
+}
+
+variable "redis_masterslave_replica_count" {
+  description = "Number of replicas"
   type        = number
   default     = 2
+}
+
+variable "redis_rediscluster_shared_count" {
+  description = "Number of shareds"
+  type        = number
+  default     = 1
+}
+
+variable "redis_rediscluster_slave_count" {
+  description = "Number of salves"
+  type        = number
+  default     = 1
 }
 
 variable "redis_deployment_type" {

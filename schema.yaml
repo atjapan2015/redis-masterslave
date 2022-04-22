@@ -37,15 +37,18 @@ variableGroups:
         - show_advanced
     variables:
       - redis_prefix
-      - redis_deployment_type
       - redis_version
-      - redis_config_is_use_rdb
-      - redis_config_is_use_aof
+      - redis_deployment_type
+      - redis_standalone_master_count
+      - redis_masterslave_master_count
+      - redis_masterslave_replica_count
+      - redis_rediscluster_shared_count
+      - redis_rediscluster_slave_count
       - redis_port1
       - redis_port2
       - sentinel_port
-      - redis_master_count
-      - redis_replica_count
+      - redis_config_is_use_rdb
+      - redis_config_is_use_aof
 
   - title: Monitoring Optional Configuration
     visible:
@@ -161,58 +164,80 @@ variables:
       - "6.0.4"
       - "6.2.5"
 
-  redis_master_count:
+  redis_standalone_master_count:
     type: number
     required: true
     minimum: 1
     maximum: 1
     multipleOf: 1
     default: 1
-    title: "Redis master node number"
-    description:
-      "Choose redis master node number (we recommend default 1).":
-        and:
-          or:
-            - eq:
-                - redis_deployment_type
-                - "Standalone"
-            - eq:
-                - redis_deployment_type
-                - "Master Slave"
-      "Choose redis master node number (we recommend default 3).":
-        and:
-          - eq:
-              - redis_deployment_type
-              - "Redis Cluster"
+    title: "Number of redis master node"
+    description: "Choose number of redis master node."
+    visible:
+      and:
+        - eq:
+            - redis_deployment_type
+            - "Standalone"
 
-  redis_replica_count:
+  redis_masterslave_master_count:
     type: number
-    required: false
-    minimum:
-      1:
-        or:
-          - eq:
-              - redis_deployment_type
-              - "Redis Cluster"
-      2:
-        or:
-          - eq:
-              - redis_deployment_type
-              - "Master Slave"
+    required: true
+    minimum: 1
+    maximum: 1
+    multipleOf: 1
+    default: 1
+    title: "Number of redis master node"
+    description: "Choose number of redis master node."
+    visible:
+      and:
+        - eq:
+            - redis_deployment_type
+            - "Master Slave"
+
+  redis_masterslave_replica_count:
+    type: number
+    required: true
+    minimum: 2
     maximum: 2
     multipleOf: 1
     default: 2
-    title: "Redis slave node number"
-    description: "Choose redis slave node number (we recommend default 2)."
+    title: "Number of redis replicas"
+    description: "Choose number of redis replicas."
     visible:
       and:
-        - or:
-            - eq:
-                - redis_deployment_type
-                - "Master Slave"
-            - eq:
-                - redis_deployment_type
-                - "Redis Cluster"
+        - eq:
+            - redis_deployment_type
+            - "Master Slave"
+
+  redis_rediscluster_shared_count:
+    type: number
+    required: true
+    minimum: 3
+    maximum: 4
+    multipleOf: 1
+    default: 3
+    title: "Number of redis master nodes"
+    description: "Choose number of redis master nodes."
+    visible:
+      and:
+        - eq:
+            - redis_deployment_type
+            - "Redis Cluster"
+
+  redis_rediscluster_slave_count:
+    type: number
+    required: true
+    minimum: 0
+    maximum: 2
+    multipleOf: 1
+    default: 1
+    title: "Number of redis slaves"
+    description: "Choose number of redis slaves."
+    visible:
+      and:
+        - eq:
+            - redis_deployment_type
+            - "Redis Cluster"
 
   redis_config_is_use_rdb:
     type: boolean

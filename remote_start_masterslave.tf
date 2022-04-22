@@ -3,7 +3,7 @@
 
 resource "null_resource" "redis_master_start_redis_masterslave" {
   depends_on = [null_resource.redis_master_bootstrap]
-  count      = (var.redis_deployment_type == "Master Slave") ? var.redis_master_count : 0
+  count      = (var.redis_deployment_type == "Master Slave") ? var.redis_masterslave_master_count : 0
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
@@ -30,7 +30,7 @@ resource "null_resource" "redis_master_start_redis_masterslave" {
 
 resource "null_resource" "redis_replica_start_redis_masterslave" {
   depends_on = [null_resource.redis_master_start_redis_masterslave]
-  count      = (var.redis_deployment_type == "Master Slave") ? var.redis_replica_count * var.redis_master_count : 0
+  count      = (var.redis_deployment_type == "Master Slave") ? var.redis_masterslave_replica_count * var.redis_masterslave_master_count : 0
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
@@ -42,11 +42,11 @@ resource "null_resource" "redis_replica_start_redis_masterslave" {
       timeout     = "10m"
     }
     inline = [
-      "echo '=== Starting REDIS on redis${count.index + var.redis_master_count} node... ==='",
+      "echo '=== Starting REDIS on redis${count.index + var.redis_masterslave_master_count} node... ==='",
       "sudo systemctl start redis.service",
       "sleep 5",
       "sudo systemctl status redis.service",
-      "echo '=== Started REDIS on redis${count.index + var.redis_master_count} node... ==='",
+      "echo '=== Started REDIS on redis${count.index + var.redis_masterslave_master_count} node... ==='",
       "echo '=== Register REDIS Exporter to Prometheus... ==='",
       "curl -X GET http://${var.prometheus_server}:${var.prometheus_port}/prometheus/targets/add/${data.oci_core_vnic.redis_replica_vnic[count.index].hostname_label}_${var.redis_exporter_port}}",
       "echo '=== Register REDIS Datasource to Redis Insight... ==='",
@@ -57,7 +57,7 @@ resource "null_resource" "redis_replica_start_redis_masterslave" {
 
 resource "null_resource" "redis_master_master_list_masterslave" {
   depends_on = [null_resource.redis_replica_start_redis_masterslave]
-  count      = (var.redis_deployment_type == "Master Slave") ? var.redis_master_count : 0
+  count      = (var.redis_deployment_type == "Master Slave") ? var.redis_masterslave_master_count : 0
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
@@ -80,7 +80,7 @@ resource "null_resource" "redis_master_master_list_masterslave" {
 
 resource "null_resource" "redis_master_start_sentinel_masterslave" {
   depends_on = [null_resource.redis_master_master_list_masterslave]
-  count      = (var.redis_deployment_type == "Master Slave") ? var.redis_master_count : 0
+  count      = (var.redis_deployment_type == "Master Slave") ? var.redis_masterslave_master_count : 0
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
@@ -104,7 +104,7 @@ resource "null_resource" "redis_master_start_sentinel_masterslave" {
 
 resource "null_resource" "redis_replica_start_sentinel_masterslave" {
   depends_on = [null_resource.redis_master_start_sentinel_masterslave]
-  count      = (var.redis_deployment_type == "Master Slave") ? var.redis_replica_count : 0
+  count      = (var.redis_deployment_type == "Master Slave") ? var.redis_masterslave_replica_count : 0
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
@@ -116,12 +116,12 @@ resource "null_resource" "redis_replica_start_sentinel_masterslave" {
       timeout     = "10m"
     }
     inline = [
-      "echo '=== Starting REDIS SENTINEL on redis${count.index + var.redis_master_count} node... ==='",
+      "echo '=== Starting REDIS SENTINEL on redis${count.index + var.redis_masterslave_master_count} node... ==='",
       "sudo systemctl enable redis-sentinel.service",
       "sudo systemctl start redis-sentinel.service",
       "sleep 5",
       "sudo systemctl status redis-sentinel.service",
-      "echo '=== Started REDIS SENTINEL on redis${count.index + var.redis_master_count} node... ==='"
+      "echo '=== Started REDIS SENTINEL on redis${count.index + var.redis_masterslave_master_count} node... ==='"
     ]
   }
 }

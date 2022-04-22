@@ -3,7 +3,7 @@
 
 resource "null_resource" "redis_master_start_redis_rediscluster" {
   depends_on = [null_resource.redis_master_bootstrap]
-  count      = (var.redis_deployment_type == "Redis Cluster") ? var.redis_master_count : 0
+  count      = (var.redis_deployment_type == "Redis Cluster") ? var.redis_rediscluster_shared_count : 0
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
@@ -28,7 +28,7 @@ resource "null_resource" "redis_master_start_redis_rediscluster" {
 
 resource "null_resource" "redis_replica_start_redis_rediscluster" {
   depends_on = [null_resource.redis_master_start_redis_rediscluster]
-  count      = (var.redis_deployment_type == "Redis Cluster") ? var.redis_replica_count * var.redis_master_count : 0
+  count      = (var.redis_deployment_type == "Redis Cluster") ? var.redis_rediscluster_slave_count * var.redis_rediscluster_shared_count : 0
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
@@ -40,11 +40,11 @@ resource "null_resource" "redis_replica_start_redis_rediscluster" {
       timeout     = "10m"
     }
     inline = [
-      "echo '=== Starting REDIS on redis${count.index + var.redis_master_count} node... ==='",
+      "echo '=== Starting REDIS on redis${count.index + var.redis_rediscluster_shared_count} node... ==='",
       "sudo systemctl start redis.service",
       "sleep 5",
       "sudo systemctl status redis.service",
-      "echo '=== Started REDIS on redis${count.index + var.redis_master_count} node... ==='",
+      "echo '=== Started REDIS on redis${count.index + var.redis_rediscluster_shared_count} node... ==='",
       "echo '=== Register REDIS Exporter to Prometheus... ==='",
       "curl -X GET http://${var.prometheus_server}:${var.prometheus_port}/prometheus/targets/add/${data.oci_core_vnic.redis_replica_vnic[count.index].hostname_label}_${var.redis_exporter_port}}"
     ]
@@ -53,7 +53,7 @@ resource "null_resource" "redis_replica_start_redis_rediscluster" {
 
 resource "null_resource" "redis_master_master_list_rediscluster" {
   depends_on = [null_resource.redis_replica_start_redis_rediscluster]
-  count      = (var.redis_deployment_type == "Redis Cluster") ? var.redis_master_count : 0
+  count      = (var.redis_deployment_type == "Redis Cluster") ? var.redis_rediscluster_shared_count : 0
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
@@ -76,7 +76,7 @@ resource "null_resource" "redis_master_master_list_rediscluster" {
 
 resource "null_resource" "redis_replica_replica_list_rediscluster" {
   depends_on = [null_resource.redis_master_master_list_rediscluster]
-  count      = (var.redis_deployment_type == "Redis Cluster") ? var.redis_replica_count * var.redis_master_count : 0
+  count      = (var.redis_deployment_type == "Redis Cluster") ? var.redis_rediscluster_slave_count * var.redis_rediscluster_shared_count : 0
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
@@ -112,7 +112,7 @@ resource "null_resource" "redis_master_create_cluster_rediscluster" {
     }
     inline = [
       "echo '=== Create REDIS CLUSTER from redis0 node... ==='",
-      "sudo -u root /usr/local/bin/redis-cli --cluster create `cat /home/opc/master_list.sh` `cat /home/opc/replica_list.sh` -a ${random_string.redis_password.result} --cluster-replicas ${var.redis_replica_count} --cluster-yes",
+      "sudo -u root /usr/local/bin/redis-cli --cluster create `cat /home/opc/master_list.sh` `cat /home/opc/replica_list.sh` -a ${random_string.redis_password.result} --cluster-replicas ${var.redis_rediscluster_slave_count} --cluster-yes",
       "echo '=== Cluster REDIS created from redis0 node... ==='",
       "echo 'cluster info' | /usr/local/bin/redis-cli -c -a ${random_string.redis_password.result}",
       "echo 'cluster nodes' | /usr/local/bin/redis-cli -c -a ${random_string.redis_password.result}",
