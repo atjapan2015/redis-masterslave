@@ -27,7 +27,9 @@ variableGroups:
   - subnet_redis_subnet_id
 
 - title: Advanced Configuration
-    - show_advanced
+  visible: true
+  variables:
+  - show_advanced
 
 - title: Redis/Sentinel Optional Configuration
   visible: 
