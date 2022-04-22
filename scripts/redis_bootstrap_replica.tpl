@@ -33,7 +33,7 @@ port ${redis_port1}
 logfile /var/log/redis/redis.log
 dir /u01/redis_data
 pidfile /var/run/redis/redis.pid
-%{ if is_redis_cluster ~}
+%{ if redis_deployment_type ~}
 cluster-enabled yes
 cluster-config-file /etc/nodes.conf
 cluster-node-timeout 5000

@@ -59,7 +59,7 @@ data "template_cloudinit_config" "cloud_init" {
 
 data "template_file" "redis_bootstrap_master_template" {
   template = templatefile("./scripts/redis_bootstrap_master.tpl", {
-    is_redis_cluster        = var.is_redis_cluster
+    redis_deployment_type        = var.redis_deployment_type
     redis_prefix            = var.redis_prefix
     redis_domain            = data.oci_core_subnet.redis_subnet.dns_label
     redis_version           = var.redis_version
@@ -78,7 +78,7 @@ data "template_file" "redis_bootstrap_master_template" {
 
 data "template_file" "redis_bootstrap_replica_template" {
   template = templatefile("./scripts/redis_bootstrap_replica.tpl", {
-    is_redis_cluster        = var.is_redis_cluster
+    redis_deployment_type        = var.redis_deployment_type
     redis_prefix            = var.redis_prefix
     redis_domain            = data.oci_core_subnet.redis_subnet.dns_label
     redis_version           = var.redis_version

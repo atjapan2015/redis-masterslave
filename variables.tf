@@ -21,7 +21,7 @@ variable "redis_replica_count" {
   default     = 2
 }
 
-variable "is_redis_cluster" {
+variable "redis_deployment_type" {
   description = "true for redis cluster, false for master-slave"
   type        = bool
   default     = false

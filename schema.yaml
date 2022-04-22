@@ -37,15 +37,15 @@ variableGroups:
         - show_advanced
   variables:
   - redis_prefix
-  - is_redis_cluster
+  - redis_deployment_type
   - redis_version
-  - redis_master_count
-  - redis_replica_count
   - redis_config_is_use_rdb
   - redis_config_is_use_aof
   - redis_port1
   - redis_port2
   - sentinel_port
+  - redis_master_count
+  - redis_replica_count
 
 - title: Monitoring Optional Configuration
   visible:
@@ -54,6 +54,7 @@ variableGroups:
   variables:
     - prometheus_server
     - prometheus_port
+    - redis_exporter_port
     - grafana_server
     - grafana_port
     - grafana_user
@@ -138,11 +139,15 @@ variables:
     title: "Redis prefix"
     description: "Name the prefix for all OCI resources (compute) that will be created."
 
-  is_redis_cluster:
-    type: boolean
+  redis_deployment_type:
+    type: enum
     title: "Redis deployment type?"
     description: "Choose redis deployment type to be deployed."
-    default: false
+    enum:
+      - "Standalone"
+      - "Master Slave"
+      - "Redis Cluster"
+    default: "Redis Cluster"
 
   redis_version:
     type: enum
@@ -154,7 +159,7 @@ variables:
       - "5.0.9"
       - "6.0.4"
       - "6.2.5"
-      -
+
   redis_master_count:
     type: number
     required: true
@@ -179,7 +184,7 @@ variables:
     type: boolean
     title: "RDB (Redis Database)?"
     description: "Choose whether to use RDB (Redis Database) to perform point-in-time snapshots."
-    default: false
+    default: true
 
   redis_config_is_use_aof:
     type: boolean
@@ -233,6 +238,16 @@ variables:
     default: 9091
     title: "Prometheus server port"
     description: "Input prometheus server port."
+
+  redis_exporter_port:
+    type: number
+    required: false
+    minimum: 0
+    maximum: 65535
+    multipleOf: 1
+    default: 9121
+    title: "Redis exporter port for rometheus"
+    description: "Input redis exporter port for rometheus."
 
   grafana_server:
     type: string

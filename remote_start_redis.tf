@@ -80,7 +80,7 @@ resource "null_resource" "redis_master_master_list" {
 
 resource "null_resource" "redis_master_start_sentinel" {
   depends_on = [null_resource.redis_master_master_list]
-  count      = var.is_redis_cluster ? 0 : var.redis_master_count
+  count      = (var.redis_deployment_type == "Master Slave") ? var.redis_master_count : 0
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
@@ -102,8 +102,32 @@ resource "null_resource" "redis_master_start_sentinel" {
   }
 }
 
-resource "null_resource" "redis_master_register_grafana_insight" {
+resource "null_resource" "redis_replica_start_sentinel" {
   depends_on = [null_resource.redis_master_start_sentinel]
+  count      = (var.redis_deployment_type == "Master Slave") ? var.redis_replica_count : 0
+  provisioner "remote-exec" {
+    connection {
+      type        = "ssh"
+      user        = "opc"
+      host        = data.oci_core_vnic.redis_replica_vnic[count.index].public_ip_address
+      private_key = tls_private_key.public_private_key_pair.private_key_pem
+      script_path = "/home/opc/myssh.sh"
+      agent       = false
+      timeout     = "10m"
+    }
+    inline = [
+      "echo '=== Starting REDIS SENTINEL on redis${count.index + var.redis_master_count} node... ==='",
+      "sudo systemctl enable redis-sentinel.service",
+      "sudo systemctl start redis-sentinel.service",
+      "sleep 5",
+      "sudo systemctl status redis-sentinel.service",
+      "echo '=== Started REDIS SENTINEL on redis${count.index + var.redis_master_count} node... ==='"
+    ]
+  }
+}
+
+resource "null_resource" "redis_master_register_grafana_insight" {
+  depends_on = [null_resource.redis_replica_start_sentinel]
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
