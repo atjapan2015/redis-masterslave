@@ -130,7 +130,7 @@ variables:
 
   redis_prefix:
     type: string
-    required: false
+    required: true
     default: "redis"
     title: "Redis prefix"
     description: "Name the prefix for all OCI resources (compute) that will be created."

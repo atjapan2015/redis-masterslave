@@ -123,7 +123,7 @@ variable "instance_flex_shape_memory" {
 }
 
 variable "tag_value" {
-  type    = object({ definedTags = object({}), freeformTags = object({}) })
+  type    = object({ definedTags = map(any), freeformTags = map(any) })
   default = {
     definedTags  = {
       "RedisManager\\deploy-redis-cluster-a7b1.release" = "1.1"
