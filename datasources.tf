@@ -39,7 +39,7 @@ data "template_file" "cloud_init_file" {
   template = file("./cloud_init/bootstrap.template.yaml")
 
   vars = {
-    ssh_public_key                           = tls_private_key.public_private_key_pair.public_key_openssh
+    ssh_public_key                           = var.ssh_public_key
     redis_rdb_copy_hourly_sh_content         = base64gzip(data.template_file.redis_rdb_copy_hourly_sh_template.rendered)
     redis_rdb_copy_daily_sh_content          = base64gzip(data.template_file.redis_rdb_copy_daily_sh_template.rendered)
     redis_rdb_restore_sh_content             = base64gzip(data.template_file.redis_rdb_restore_sh_template.rendered)

@@ -8,78 +8,78 @@ version: "20220422"
 locale: "en"
 
 variableGroups:
-- title: General Configuration
-  visible: false
-  variables:
-  - tenancy_ocid
-  - region
-  - release
+  - title: General Configuration
+    visible: false
+    variables:
+      - tenancy_ocid
+      - region
+      - release
 
-- title: Required Configuration
-  visible: true  
-  variables:
-  - compartment_ocid
-  - availablity_domain_name
+  - title: Required Configuration
+    visible: true
+    variables:
+      - compartment_ocid
+      - availablity_domain_name
 
-- title: Networking Optional Configuration
-  variables:
-  - virtual_network_redis_vcn_id
-  - subnet_redis_subnet_id
+  - title: Networking Optional Configuration
+    variables:
+      - virtual_network_redis_vcn_id
+      - subnet_redis_subnet_id
 
-- title: Advanced Configuration
-  visible: true
-  variables:
-  - show_advanced
+  - title: Advanced Configuration
+    visible: true
+    variables:
+      - show_advanced
 
-- title: Redis/Sentinel Optional Configuration
-  visible: 
+  - title: Redis/Sentinel Optional Configuration
+    visible:
       and:
         - show_advanced
-  variables:
-  - redis_prefix
-  - redis_deployment_type
-  - redis_version
-  - redis_config_is_use_rdb
-  - redis_config_is_use_aof
-  - redis_port1
-  - redis_port2
-  - sentinel_port
-  - redis_master_count
-  - redis_replica_count
+    variables:
+      - redis_prefix
+      - redis_deployment_type
+      - redis_version
+      - redis_config_is_use_rdb
+      - redis_config_is_use_aof
+      - redis_port1
+      - redis_port2
+      - sentinel_port
+      - redis_master_count
+      - redis_replica_count
 
-- title: Monitoring Optional Configuration
-  visible:
-    and:
-      - show_advanced
-  variables:
-    - prometheus_server
-    - prometheus_port
-    - redis_exporter_port
-    - grafana_server
-    - grafana_port
-    - grafana_user
-    - grafana_password
-    - redis_insight_server
-    - redis_insight_port
-
-- title: Compute Optional Configuration
-  visible: 
+  - title: Monitoring Optional Configuration
+    visible:
       and:
         - show_advanced
-  variables:  
-  - ssh_public_key
-  - instance_shape
-  - instance_flex_shape_ocpus
-  - instance_flex_shape_memory
-  - instance_os
-  - linux_os_version
+    variables:
+      - prometheus_server
+      - prometheus_port
+      - redis_exporter_port
+      - grafana_server
+      - grafana_port
+      - grafana_user
+      - grafana_password
+      - redis_insight_server
+      - redis_insight_port
 
-- title: Tagging
-  visible:
-    and:
-      - show_advanced
-  variables:
-    - tag_value
+  - title: Compute Optional Configuration
+    visible:
+      and:
+        - show_advanced
+    variables:
+      - ssh_public_key
+      - instance_shape
+      - instance_flex_shape_ocpus
+      - instance_flex_shape_memory
+      - instance_os
+      - linux_os_version
+
+  - title: Tagging
+    visible:
+      and:
+        - show_advanced
+    variables:
+      - tag_value
 
 variables:
 
@@ -141,6 +141,7 @@ variables:
 
   redis_deployment_type:
     type: enum
+    required: true
     title: "Redis deployment type?"
     description: "Choose redis deployment type to be deployed."
     enum:
@@ -151,7 +152,7 @@ variables:
 
   redis_version:
     type: enum
-    required: false
+    required: true
     default: "5.0.9"
     title: "Redis version"
     description: "Choose Redis version to be deployed."
@@ -168,53 +169,88 @@ variables:
     multipleOf: 1
     default: 1
     title: "Redis master node number"
-    description: "Choose redis master node number (we recommend default 1)."
+    description:
+      "Choose redis master node number (we recommend default 1).":
+        and:
+          or:
+            - eq:
+                - redis_deployment_type
+                - "Standalone"
+            - eq:
+                - redis_deployment_type
+                - "Master Slave"
+      "Choose redis master node number (we recommend default 3).":
+        and:
+          - eq:
+              - redis_deployment_type
+              - "Redis Cluster"
 
   redis_replica_count:
     type: number
-    required: true
-    minimum: 2
+    required: false
+    minimum:
+      1:
+        or:
+          - eq:
+              - redis_deployment_type
+              - "Redis Cluster"
+      2:
+        or:
+          - eq:
+              - redis_deployment_type
+              - "Master Slave"
     maximum: 2
     multipleOf: 1
     default: 2
     title: "Redis slave node number"
     description: "Choose redis slave node number (we recommend default 2)."
+    visible:
+      and:
+        - or:
+            - eq:
+                - redis_deployment_type
+                - "Master Slave"
+            - eq:
+                - redis_deployment_type
+                - "Redis Cluster"
 
   redis_config_is_use_rdb:
     type: boolean
+    required: true
     title: "RDB (Redis Database)?"
     description: "Choose whether to use RDB (Redis Database) to perform point-in-time snapshots."
     default: true
 
   redis_config_is_use_aof:
     type: boolean
+    required: true
     title: "Append Only File(AOF)?"
     description: "Choose whether to use append only file(AOF) to persistence logs every write operation received by the server."
     default: false
 
   redis_port1:
     type: number
-    required: false
+    required: true
     minimum: 0
     maximum: 65535
     multipleOf: 1
     default: 6379
     title: "Redis client port"
-    description: "Choose Redis normal client communication port (we recommend default 6379)."  
+    description: "Choose Redis normal client communication port (we recommend default 6379)."
 
   redis_port2:
     type: number
-    required: false
+    required: true
     minimum: 0
     maximum: 65535
     multipleOf: 1
     default: 16379
     title: "Redis cluster bus port"
-    description: "Choose Redis cluster bus port must be reachable from all the other cluster nodes. (we recommend default 16379)."  
+    description: "Choose Redis cluster bus port must be reachable from all the other cluster nodes. (we recommend default 16379)."
 
   sentinel_port:
     type: number
-    required: false
+    required: true
     minimum: 0
     maximum: 65535
     multipleOf: 1
@@ -324,12 +360,12 @@ variables:
     visible:
       and:
         - or:
-          - eq:
-            - instance_shape 
-            - "VM.Standard.E4.Flex"
-          - eq:
-            - instance_shape
-            - "VM.Standard3.Flex"
+            - eq:
+                - instance_shape
+                - "VM.Standard.E4.Flex"
+            - eq:
+                - instance_shape
+                - "VM.Standard3.Flex"
 
   instance_flex_shape_memory:
     type: number
@@ -343,12 +379,12 @@ variables:
     visible:
       and:
         - or:
-          - eq:
-            - instance_shape
-            - "VM.Standard.E4.Flex"
-          - eq:
-            - instance_shape 
-            - "VM.Standard3.Flex"
+            - eq:
+                - instance_shape
+                - "VM.Standard.E4.Flex"
+            - eq:
+                - instance_shape
+                - "VM.Standard3.Flex"
 
   instance_os:
     type: enum
@@ -380,44 +416,44 @@ variables:
     required: false
     visible: false
     title: "Reference Architecture Release"
-    
+
 outputs:
-  
-#  redis1_public_ip_address:
-#    title: "Redis1 Server Public IP"
-#    displayText: "Redis1 Server Public IP"
-#    type: copyableString
-#    visible: true
-#
-#  redis2_public_ip_address:
-#    title: "Redis2 Server Public IP"
-#    displayText: "Redis2 Server Public IP"
-#    type: copyableString
-#    visible: true
-#
-#  redis3_public_ip_address:
-#    title: "Redis3 Server Public IP"
-#    displayText: "Redis3 Server Public IP"
-#    type: copyableString
-#    visible: true
-#
-#  redis4_public_ip_address:
-#    title: "Redis4 Server Public IP"
-#    displayText: "Redis4 Server Public IP"
-#    type: copyableString
-#    visible: true
-#
-#  redis5_public_ip_address:
-#    title: "Redis5 Server Public IP"
-#    displayText: "Redis5 Server Public IP"
-#    type: copyableString
-#    visible: true
-#
-#  redis6_public_ip_address:
-#    title: "Redis6 Server Public IP"
-#    displayText: "Redis6 Server Public IP"
-#    type: copyableString
-#    visible: true
+
+  #  redis1_public_ip_address:
+  #    title: "Redis1 Server Public IP"
+  #    displayText: "Redis1 Server Public IP"
+  #    type: copyableString
+  #    visible: true
+  #
+  #  redis2_public_ip_address:
+  #    title: "Redis2 Server Public IP"
+  #    displayText: "Redis2 Server Public IP"
+  #    type: copyableString
+  #    visible: true
+  #
+  #  redis3_public_ip_address:
+  #    title: "Redis3 Server Public IP"
+  #    displayText: "Redis3 Server Public IP"
+  #    type: copyableString
+  #    visible: true
+  #
+  #  redis4_public_ip_address:
+  #    title: "Redis4 Server Public IP"
+  #    displayText: "Redis4 Server Public IP"
+  #    type: copyableString
+  #    visible: true
+  #
+  #  redis5_public_ip_address:
+  #    title: "Redis5 Server Public IP"
+  #    displayText: "Redis5 Server Public IP"
+  #    type: copyableString
+  #    visible: true
+  #
+  #  redis6_public_ip_address:
+  #    title: "Redis6 Server Public IP"
+  #    displayText: "Redis6 Server Public IP"
+  #    type: copyableString
+  #    visible: true
 
   redis_password:
     title: "Redis auth password"
@@ -428,5 +464,5 @@ outputs:
   generated_ssh_private_key:
     title: "Generated SSH Private Key"
     displayText: "Generated SSH Private Key"
-    type: string
+    type: copyableString
     visible: true
