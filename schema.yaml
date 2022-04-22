@@ -1,10 +1,10 @@
 ## Copyright © 2020, Oracle and/or its affiliates. 
 ## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
 
-title: "Create typical six-node deployment of a Redis cluster on Oracle Cloud Infrastructure Compute instances"
-stackDescription: "Deploy six-node deployment of a Redis cluster on Oracle Cloud Infrastructure Compute instances to take advantage of in-memory data structure store that is used as a database, cache, and message broker."
+title: "Create number of nodes deployment of a Redis Master Slave on Oracle Cloud Infrastructure Compute instances"
+stackDescription: "Deploy number of nodes deployment of a Redis Master Slave on Oracle Cloud Infrastructure Compute instances to take advantage of in-memory data structure store that is used as a database, cache, and message broker."
 schemaVersion: 1.1.0
-version: "20190404"
+version: "20220422"
 locale: "en"
 
 variableGroups:
@@ -20,34 +20,41 @@ variableGroups:
   variables:
   - compartment_ocid
   - availablity_domain_name
-  - show_advanced 
 
 - title: Networking Optional Configuration
-  visible: 
-      and:
-        - show_advanced
-  variables:  
+  variables:
   - virtual_network_redis_vcn_id
   - subnet_redis_subnet_id
-  - redis_prefix
+
+- title: Advanced Configuration
+    - show_advanced
 
 - title: Redis/Sentinel Optional Configuration
   visible: 
       and:
         - show_advanced
-  variables:  
+  variables:
+  - redis_prefix
+  - redis_master_count
+  - redis_replica_count
   - redis_version
   - redis_port1
   - redis_port2
   - sentinel_port
-  - prometheus_server
-  - prometheus_port
-  - grafana_server
-  - grafana_port
-  - grafana_user
-  - grafana_password
-  - redis_insight_server
-  - redis_insight_port
+
+- title: Monitoring Optional Configuration
+  visible:
+    and:
+      - show_advanced
+  variables:
+    - prometheus_server
+    - prometheus_port
+    - grafana_server
+    - grafana_port
+    - grafana_user
+    - grafana_password
+    - redis_insight_server
+    - redis_insight_port
 
 - title: Compute Optional Configuration
   visible: 
@@ -60,7 +67,14 @@ variableGroups:
   - instance_flex_shape_memory
   - instance_os
   - linux_os_version
-    
+
+- title: Tagging
+  visible:
+    and:
+      - show_advanced
+  variables:
+    - redis_manager_tag_namespace_id
+
 variables:
 
   show_advanced:
@@ -117,7 +131,27 @@ variables:
     required: false
     default: "redis"
     title: "Redis prefix"
-    description: "Name the prefix for all OCI resources (compute, VCN, subnet) that will be created."
+    description: "Name the prefix for all OCI resources (compute) that will be created."
+
+  redis_master_count:
+    type: number
+    required: true
+    minimum: 1
+    maximum: 1
+    multipleOf: 1
+    default: 1
+    title: "Redis master node number"
+    description: "Choose redis master node number (we recommend default 1)."
+
+  redis_replica_count:
+    type: number
+    required: true
+    minimum: 2
+    maximum: 2
+    multipleOf: 1
+    default: 2
+    title: "Redis slave node number"
+    description: "Choose redis slave node number (we recommend default 2)."
   
   redis_version:
     type: enum
@@ -296,12 +330,18 @@ variables:
     enum:
       - "7.9"
       - "7.8"
-  
+
+  redis_manager_tag_namespace_id:
+    type: oci:identity:tag:value
+    required: false
+    title: "Tagging"
+    description: "Optional tags to organize and track resources in your tenancy."
+
   release:
     type: string
     required: false
     visible: false
-    title: "Reference Architecture Release (OCI Architecture Center)"
+    title: "Reference Architecture Release"
     
 outputs:
   
