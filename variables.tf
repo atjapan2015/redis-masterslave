@@ -126,9 +126,7 @@ variable "tag_value" {
   type    = object({ definedTags = map(any), freeformTags = map(any) })
   default = {
     definedTags  = {}
-    freeformTags = {
-      "created by" = "terraform"
-    }
+    freeformTags = {}
   }
 }
 
