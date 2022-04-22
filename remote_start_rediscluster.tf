@@ -122,7 +122,7 @@ resource "null_resource" "redis_master_create_cluster_rediscluster" {
 
 resource "null_resource" "redis_master_register_grafana_insight_rediscluster" {
   depends_on = [null_resource.redis_master_create_cluster_rediscluster]
-  count      = (var.redis_deployment_type == "Redis Cluster") ?1 : 0
+  count      = (var.redis_deployment_type == "Redis Cluster") ? 1 : 0
   provisioner "remote-exec" {
     connection {
       type        = "ssh"

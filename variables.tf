@@ -42,7 +42,7 @@ variable "redis_rediscluster_slave_count" {
 variable "redis_deployment_type" {
   description = "Redis deployment type, available values [\"Standalone\", \"Master Slave\", \"Redis Cluster\"]"
   type        = string
-  default     = "Master Slave"
+  default     = "Standalone"
 }
 
 variable "redis_prefix" {
