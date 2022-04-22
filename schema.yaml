@@ -337,7 +337,7 @@ variables:
     minimum: 1
     maximum: 128
     multipleOf: 1
-    default: 10
+    default: 8
     title: "Flex Shape Memory (GB)"
     description: "Choose number GB for Flex Shape Memory."
     visible:

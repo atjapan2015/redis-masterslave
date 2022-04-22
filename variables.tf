@@ -16,15 +16,15 @@ variable "redis_master_count" {
 }
 
 variable "redis_replica_count" {
-  description = "Number of replicas instances, available value are [2]"
+  description = "Number of replicas instances, available values are [2]"
   type        = number
   default     = 2
 }
 
 variable "redis_deployment_type" {
-  description = "true for redis cluster, false for master-slave"
-  type        = bool
-  default     = false
+  description = "Redis deployment type, available values [\"Standalone\", \"Master Slave\", \"Redis Cluster\"]"
+  type        = string
+  default     = "Master Slave"
 }
 
 variable "redis_prefix" {
