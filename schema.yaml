@@ -1,8 +1,8 @@
 ## Copyright © 2020, Oracle and/or its affiliates. 
 ## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
 
-title: "Create number of nodes deployment of a Redis Master Slave Architecture on Oracle Cloud Infrastructure Compute instances"
-stackDescription: "Deploy number of nodes deployment of a Redis Master Slave Architecture on Oracle Cloud Infrastructure Compute instances to take advantage of in-memory data structure store that is used as a database, cache, and message broker."
+title: "Deploy redis server on Oracle Cloud Infrastructure Compute instances"
+stackDescription: "Deploy redis server(Standalone/Master Slave(Sentinel)/Redis Cluster Architecture on Oracle Cloud Infrastructure Compute instances to take advantage of in-memory data structure store that is used as a database, cache, and message broker."
 schemaVersion: 1.1.0
 version: "20220422"
 locale: "en"
