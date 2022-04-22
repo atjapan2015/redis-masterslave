@@ -125,9 +125,7 @@ variable "instance_flex_shape_memory" {
 variable "tag_value" {
   type    = object({ definedTags = map(any), freeformTags = map(any) })
   default = {
-    definedTags  = {
-      "RedisManager\\deploy-redis-cluster-a7b1.release" = "1.1"
-    }
+    definedTags  = {}
     freeformTags = {
       "created by" = "terraform"
     }

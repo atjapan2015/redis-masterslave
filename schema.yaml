@@ -37,9 +37,12 @@ variableGroups:
         - show_advanced
   variables:
   - redis_prefix
+  - is_redis_cluster
+  - redis_version
   - redis_master_count
   - redis_replica_count
-  - redis_version
+  - redis_config_is_use_rdb
+  - redis_config_is_use_aof
   - redis_port1
   - redis_port2
   - sentinel_port
@@ -135,6 +138,23 @@ variables:
     title: "Redis prefix"
     description: "Name the prefix for all OCI resources (compute) that will be created."
 
+  is_redis_cluster:
+    type: boolean
+    title: "Redis deployment type?"
+    description: "Choose redis deployment type to be deployed."
+    default: false
+
+  redis_version:
+    type: enum
+    required: false
+    default: "5.0.9"
+    title: "Redis version"
+    description: "Choose Redis version to be deployed."
+    enum:
+      - "5.0.9"
+      - "6.0.4"
+      - "6.2.5"
+      -
   redis_master_count:
     type: number
     required: true
@@ -154,17 +174,18 @@ variables:
     default: 2
     title: "Redis slave node number"
     description: "Choose redis slave node number (we recommend default 2)."
-  
-  redis_version:
-    type: enum
-    required: false
-    default: "5.0.9"
-    title: "Redis version"
-    description: "Choose Redis version to be deployed."  
-    enum:
-      - "5.0.9"
-      - "6.0.4"
-      - "6.2.5"
+
+  redis_config_is_use_rdb:
+    type: boolean
+    title: "RDB (Redis Database)?"
+    description: "Choose whether to use RDB (Redis Database) to perform point-in-time snapshots."
+    default: false
+
+  redis_config_is_use_aof:
+    type: boolean
+    title: "Append Only File(AOF)?"
+    description: "Choose whether to use append only file(AOF) to persistence logs every write operation received by the server."
+    default: false
 
   redis_port1:
     type: number
