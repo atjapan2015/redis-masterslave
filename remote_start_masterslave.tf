@@ -1,9 +1,9 @@
 ## Copyright (c) 2020, Oracle and/or its affiliates. 
 ## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
 
-resource "null_resource" "redis_master_start_redis" {
+resource "null_resource" "redis_master_start_redis_masterslave" {
   depends_on = [null_resource.redis_master_bootstrap]
-  count      = var.redis_master_count
+  count      = (var.redis_deployment_type == "Master Slave") ? var.redis_master_count : 0
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
@@ -28,9 +28,9 @@ resource "null_resource" "redis_master_start_redis" {
   }
 }
 
-resource "null_resource" "redis_replica_start_redis" {
-  depends_on = [null_resource.redis_master_start_redis]
-  count      = var.redis_replica_count * var.redis_master_count
+resource "null_resource" "redis_replica_start_redis_masterslave" {
+  depends_on = [null_resource.redis_master_start_redis_masterslave]
+  count      = (var.redis_deployment_type == "Master Slave") ? var.redis_replica_count * var.redis_master_count : 0
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
@@ -55,9 +55,9 @@ resource "null_resource" "redis_replica_start_redis" {
   }
 }
 
-resource "null_resource" "redis_master_master_list" {
-  depends_on = [null_resource.redis_replica_start_redis]
-  count      = var.redis_master_count
+resource "null_resource" "redis_master_master_list_masterslave" {
+  depends_on = [null_resource.redis_replica_start_redis_masterslave]
+  count      = (var.redis_deployment_type == "Master Slave") ? var.redis_master_count : 0
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
@@ -78,8 +78,8 @@ resource "null_resource" "redis_master_master_list" {
   }
 }
 
-resource "null_resource" "redis_master_start_sentinel" {
-  depends_on = [null_resource.redis_master_master_list]
+resource "null_resource" "redis_master_start_sentinel_masterslave" {
+  depends_on = [null_resource.redis_master_master_list_masterslave]
   count      = (var.redis_deployment_type == "Master Slave") ? var.redis_master_count : 0
   provisioner "remote-exec" {
     connection {
@@ -102,8 +102,8 @@ resource "null_resource" "redis_master_start_sentinel" {
   }
 }
 
-resource "null_resource" "redis_replica_start_sentinel" {
-  depends_on = [null_resource.redis_master_start_sentinel]
+resource "null_resource" "redis_replica_start_sentinel_masterslave" {
+  depends_on = [null_resource.redis_master_start_sentinel_masterslave]
   count      = (var.redis_deployment_type == "Master Slave") ? var.redis_replica_count : 0
   provisioner "remote-exec" {
     connection {
@@ -126,8 +126,9 @@ resource "null_resource" "redis_replica_start_sentinel" {
   }
 }
 
-resource "null_resource" "redis_master_register_grafana_insight" {
-  depends_on = [null_resource.redis_replica_start_sentinel]
+resource "null_resource" "redis_master_register_grafana_insight_masterslave" {
+  depends_on = [null_resource.redis_replica_start_sentinel_masterslave]
+  count      = (var.redis_deployment_type == "Master Slave") ? 1 : 0
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
