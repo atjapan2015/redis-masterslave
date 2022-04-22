@@ -33,7 +33,7 @@ port ${redis_port1}
 logfile /var/log/redis/redis.log
 dir /u01/redis_data
 pidfile /var/run/redis/redis.pid
-%{ if redis_deployment_type ~}
+%{ if redis_deployment_type == "Master Slave" ~}
 cluster-enabled yes
 cluster-config-file /etc/nodes.conf
 cluster-node-timeout 5000
