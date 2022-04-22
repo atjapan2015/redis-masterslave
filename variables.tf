@@ -64,6 +64,10 @@ variable "sentinel_port" {
   default = "26379"
 }
 
+variable "redis_exporter_port" {
+  default = "9121"
+}
+
 variable "redis_config_is_use_rdb" {
   description = "true for use rdb, false for not use rdb"
   type        = bool
@@ -80,8 +84,36 @@ variable "ssh_public_key" {
   default = ""
 }
 
-variable "global_password" {
+variable "prometheus_server" {
+  default = "redismanager"
+}
+
+variable "prometheus_port" {
+  default = "9091"
+}
+
+variable "grafana_server" {
+  default = "redismanager"
+}
+
+variable "grafana_port" {
+  default = "3000"
+}
+
+variable "grafana_user" {
+  default = "admin"
+}
+
+variable "grafana_password" {
   default = ""
+}
+
+variable "redis_insight_server" {
+  default = "redismanager"
+}
+
+variable "redis_insight_port" {
+  default = "8001"
 }
 
 variable "instance_os" {

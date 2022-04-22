@@ -66,6 +66,7 @@ data "template_file" "redis_bootstrap_master_template" {
     redis_port1             = var.redis_port1
     redis_port2             = var.redis_port2
     sentinel_port           = var.sentinel_port
+    redis_exporter_port     = var.redis_exporter_port
     redis_config_is_use_rdb = var.redis_config_is_use_rdb
     redis_config_is_use_aof = var.redis_config_is_use_aof
     redis_password          = random_string.redis_password.result
@@ -84,6 +85,7 @@ data "template_file" "redis_bootstrap_replica_template" {
     redis_port1             = var.redis_port1
     redis_port2             = var.redis_port2
     sentinel_port           = var.sentinel_port
+    redis_exporter_port     = var.redis_exporter_port
     redis_config_is_use_rdb = var.redis_config_is_use_rdb
     redis_config_is_use_aof = var.redis_config_is_use_aof
     redis_password          = random_string.redis_password.result

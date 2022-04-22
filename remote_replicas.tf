@@ -30,6 +30,7 @@ resource "null_resource" "redis_replica_bootstrap" {
     inline = [
       "chmod +x ~/redis_bootstrap_replica.sh",
       "sudo ~/redis_bootstrap_replica.sh",
+      "if [[ ${var.redis_config_is_use_rdb} == true ]] ; then sudo crontab /u01/redis_backup_tools/redis_rdb_copy_hourly_daily.cron; fi"
     ]
   }
 }

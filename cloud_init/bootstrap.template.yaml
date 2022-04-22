@@ -1,8 +1,7 @@
 #cloud-config
 
 bootcmd:
-  # Turn off SELinux
-  - setenforce 0
+  # Create backup directory
   - sudo mkdir -p /u01/redis_backup_tools
   - sudo mkdir -p /u01/redis_restore_tools
   - sudo mkdir -p /u01/redis_backup_snapshot
@@ -31,6 +30,4 @@ write_files:
 
 runcmd:
   - echo "Running k8s init..."
-  - sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
-  - sudo crontab /u01/redis_backup_tools/redis_rdb_copy_hourly_daily.cron
   - echo "Finished k8s init."

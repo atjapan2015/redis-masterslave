@@ -12,7 +12,7 @@ SENTINEL_CONFIG_FILE=/etc/sentinel.conf
 firewall-offline-cmd --zone=public --add-port=${redis_port1}/tcp
 firewall-offline-cmd --zone=public --add-port=${redis_port2}/tcp
 firewall-offline-cmd --zone=public --add-port=${sentinel_port}/tcp
-firewall-offline-cmd --zone=public --add-port=9121/tcp
+firewall-offline-cmd --zone=public --add-port=${redis_exporter_port}/tcp
 systemctl restart firewalld
 
 # Install wget and gcc
@@ -30,6 +30,7 @@ mkdir -p /var/log/redis/
 # Configure Redis
 cat << EOF > $REDIS_CONFIG_FILE
 port ${redis_port1}
+logfile /var/log/redis/redis.log
 dir /u01/redis_data
 pidfile /var/run/redis/redis.pid
 %{ if is_redis_cluster ~}
@@ -79,7 +80,7 @@ dir "/tmp"
 pidfile "/var/run/redis/sentinel.pid"
 protected-mode no
 sentinel deny-scripts-reconfig yes
-sentinel monitor ${master_fqdn[0]}.${redis_prefix}.${redis_prefix}.${redis_domain} ${master_public_ips[0]} 6379 2
+sentinel monitor ${master_fqdn[0]}.${redis_prefix}.${redis_prefix}.${redis_domain} ${master_private_ips[0]} ${redis_port1} 2
 sentinel down-after-milliseconds ${master_fqdn[0]}.${redis_prefix}.${redis_prefix}.${redis_domain} 60000
 sentinel failover-timeout ${master_fqdn[0]}.${redis_prefix}.${redis_prefix}.${redis_domain} 180000
 sentinel auth-pass ${master_fqdn[0]}.${redis_prefix}.${redis_prefix}.${redis_domain} ${redis_password}
@@ -112,7 +113,7 @@ Description=Redis Exporter
 
 [Service]
 User=redis-exporter
-ExecStart=/usr/local/bin/redis_exporter -redis.addr redis://localhost:6379 -redis.password ${redis_password}
+ExecStart=/usr/local/bin/redis_exporter -redis.addr redis://127.0.0.1:${redis_port1} -redis.password ${redis_password}
 Restart=always
 
 [Install]

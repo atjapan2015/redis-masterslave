@@ -40,6 +40,14 @@ variableGroups:
   - redis_port1
   - redis_port2
   - sentinel_port
+  - prometheus_server
+  - prometheus_port
+  - grafana_user
+  - grafana_password
+  - grafana_server
+  - grafana_port
+  - redis_insight_server
+  - redis_insight_port
 
 - title: Compute Optional Configuration
   visible: 
@@ -85,6 +93,25 @@ variables:
     dependsOn:
       compartmentId: ${compartment_ocid}
 
+  virtual_network_redis_vcn_id:
+    type: oci:core:vcn:id
+    required: true
+    visibile: true
+    title: "Virtual cloud network"
+    description: "Choose virtual cloud network to be chosen for deploy of Redis compute instances."
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+
+  subnet_redis_subnet_id:
+    type: oci:core:subnet:id
+    required: true
+    visibile: true
+    title: "Subnet"
+    description: "Choose subnet to be chosen for deploy of Redis compute instances."
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+      vcnId: ${virtual_network_redis_vcn_id}
+
   # Optional Configuration
   VCN-CIDR:
     type: string
@@ -112,11 +139,11 @@ variables:
   redis_version:
     type: enum
     required: false
-    default: "5.0.7"
+    default: "5.0.9"
     title: "Redis version"
     description: "Choose Redis version to be deployed."  
     enum:
-      - "5.0.7"
+      - "5.0.9"
 
   redis_port1:
     type: number
@@ -146,7 +173,72 @@ variables:
     multipleOf: 1
     default: 26379
     title: "Redis Sentinel port"
-    description: "Choose Redis Sentinel port. (we recommend default 26379)."  
+    description: "Choose Redis Sentinel port. (we recommend default 26379)."
+
+  prometheus_server:
+    type: string
+    required: false
+    default: "redismanager"
+    title: "Prometheus server hostname or IP"
+    description: "Input prometheus server hostname or IP."
+
+  prometheus_port:
+    type: number
+    required: false
+    minimum: 0
+    maximum: 65535
+    multipleOf: 1
+    default: 9091
+    title: "Prometheus server port"
+    description: "Input prometheus server port."
+
+  grafana_server:
+    type: string
+    required: false
+    default: "redismanager"
+    title: "Grafana server hostname or IP"
+    description: "Input grafana server hostname or IP."
+
+  grafana_port:
+    type: number
+    required: false
+    minimum: 0
+    maximum: 65535
+    multipleOf: 1
+    default: 3000
+    title: "Grafana server port"
+    description: "Input grafana server port."
+
+  grafana_user:
+    type: string
+    required: false
+    default: "admin"
+    title: "Grafana server username"
+    description: "Input grafana server username."
+
+  grafana_password:
+    type: string
+    required: false
+    default: ""
+    title: "Grafana server password"
+    description: "Input grafana server password."
+
+  redis_insight_server:
+    type: string
+    required: false
+    default: "redismanager"
+    title: "Redis insight server hostname or IP"
+    description: "Input redis insight server hostname or IP."
+
+  redis_insight_port:
+    type: number
+    required: false
+    minimum: 0
+    maximum: 65535
+    multipleOf: 1
+    default: 8001
+    title: "Redis insight server port"
+    description: "Input Redis insight server port."
 
   ssh_public_key:
     type: oci:core:ssh:publickey
@@ -157,7 +249,7 @@ variables:
   instance_shape:
     type: oci:core:instanceshape:name
     required: false
-    default: "VM.Standard.E3.Flex"
+    default: "VM.Standard.E4.Flex"
     title: "Instance shape for Redis compute instances"
     description: "Choose the shape of the VM used for Redis compute instances."
     dependsOn:
@@ -176,7 +268,7 @@ variables:
       and:
         - or:
           - eq:
-            - instance_shape 
+            - instance_shape
             - "VM.Standard.E3.Flex"
           - eq:
             - instance_shape 
