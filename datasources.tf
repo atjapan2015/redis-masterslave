@@ -39,6 +39,7 @@ data "template_file" "cloud_init_file" {
   template = file("./cloud_init/bootstrap.template.yaml")
 
   vars = {
+    ssh_public_key                           = tls_private_key.public_private_key_pair.public_key_openssh
     redis_rdb_copy_hourly_sh_content         = base64gzip(data.template_file.redis_rdb_copy_hourly_sh_template.rendered)
     redis_rdb_copy_daily_sh_content          = base64gzip(data.template_file.redis_rdb_copy_daily_sh_template.rendered)
     redis_rdb_restore_sh_content             = base64gzip(data.template_file.redis_rdb_restore_sh_template.rendered)
@@ -59,7 +60,7 @@ data "template_cloudinit_config" "cloud_init" {
 
 data "template_file" "redis_bootstrap_master_template" {
   template = templatefile("./scripts/redis_bootstrap_master.tpl", {
-    redis_deployment_type        = var.redis_deployment_type
+    redis_deployment_type   = var.redis_deployment_type
     redis_prefix            = var.redis_prefix
     redis_domain            = data.oci_core_subnet.redis_subnet.dns_label
     redis_version           = var.redis_version
@@ -78,7 +79,7 @@ data "template_file" "redis_bootstrap_master_template" {
 
 data "template_file" "redis_bootstrap_replica_template" {
   template = templatefile("./scripts/redis_bootstrap_replica.tpl", {
-    redis_deployment_type        = var.redis_deployment_type
+    redis_deployment_type   = var.redis_deployment_type
     redis_prefix            = var.redis_prefix
     redis_domain            = data.oci_core_subnet.redis_subnet.dns_label
     redis_version           = var.redis_version

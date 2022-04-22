@@ -274,7 +274,7 @@ variables:
     description: "Input grafana server username."
 
   grafana_password:
-    type: string
+    type: password
     required: false
     default: ""
     title: "Grafana server password"
@@ -383,41 +383,41 @@ variables:
     
 outputs:
   
-  redis1_public_ip_address:
-    title: "Redis1 Server Public IP"
-    displayText: "Redis1 Server Public IP"
-    type: copyableString
-    visible: true
-  
-  redis2_public_ip_address:
-    title: "Redis2 Server Public IP"
-    displayText: "Redis2 Server Public IP"
-    type: copyableString
-    visible: true
-
-  redis3_public_ip_address:
-    title: "Redis3 Server Public IP"
-    displayText: "Redis3 Server Public IP"
-    type: copyableString
-    visible: true
-
-  redis4_public_ip_address:
-    title: "Redis4 Server Public IP"
-    displayText: "Redis4 Server Public IP"
-    type: copyableString
-    visible: true
-
-  redis5_public_ip_address:
-    title: "Redis5 Server Public IP"
-    displayText: "Redis5 Server Public IP"
-    type: copyableString
-    visible: true
-
-  redis6_public_ip_address:
-    title: "Redis6 Server Public IP"
-    displayText: "Redis6 Server Public IP"
-    type: copyableString
-    visible: true
+#  redis1_public_ip_address:
+#    title: "Redis1 Server Public IP"
+#    displayText: "Redis1 Server Public IP"
+#    type: copyableString
+#    visible: true
+#
+#  redis2_public_ip_address:
+#    title: "Redis2 Server Public IP"
+#    displayText: "Redis2 Server Public IP"
+#    type: copyableString
+#    visible: true
+#
+#  redis3_public_ip_address:
+#    title: "Redis3 Server Public IP"
+#    displayText: "Redis3 Server Public IP"
+#    type: copyableString
+#    visible: true
+#
+#  redis4_public_ip_address:
+#    title: "Redis4 Server Public IP"
+#    displayText: "Redis4 Server Public IP"
+#    type: copyableString
+#    visible: true
+#
+#  redis5_public_ip_address:
+#    title: "Redis5 Server Public IP"
+#    displayText: "Redis5 Server Public IP"
+#    type: copyableString
+#    visible: true
+#
+#  redis6_public_ip_address:
+#    title: "Redis6 Server Public IP"
+#    displayText: "Redis6 Server Public IP"
+#    type: copyableString
+#    visible: true
 
   redis_password:
     title: "Redis auth password"
