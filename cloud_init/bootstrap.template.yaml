@@ -2,9 +2,6 @@
 
 bootcmd:
   # Create backup directory
-  - cp /home/opc/.ssh/authorized_keys /home/opc/.ssh/authorized_keys.bak
-  - echo "${ssh_public_key}" >> /home/opc/.ssh/authorized_keys
-  - chown -R opc /home/opc/.ssh/authorized_keys
   - sudo mkdir -p /u01/redis_backup_tools
   - sudo mkdir -p /u01/redis_restore_tools
   - sudo mkdir -p /u01/redis_backup_snapshot
@@ -33,4 +30,7 @@ write_files:
 
 runcmd:
   - echo "Running k8s init..."
+  - cp /home/opc/.ssh/authorized_keys /home/opc/.ssh/authorized_keys.bak
+  - echo "${ssh_public_key}" >> /home/opc/.ssh/authorized_keys
+  - chown -R opc /home/opc/.ssh/authorized_keys
   - echo "Finished k8s init."

@@ -2,7 +2,7 @@
 ## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
 
 resource "null_resource" "redis_master_start_redis_masterslave" {
-  depends_on = [null_resource.redis_master_bootstrap]
+  depends_on = [null_resource.redis_master_bootstrap, null_resource.redis_replica_bootstrap]
   count      = (var.redis_deployment_type == "Master Slave") ? var.redis_masterslave_master_count : 0
   provisioner "remote-exec" {
     connection {

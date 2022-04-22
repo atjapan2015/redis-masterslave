@@ -30,7 +30,7 @@ variable "redis_masterslave_replica_count" {
 variable "redis_rediscluster_shared_count" {
   description = "Number of shareds"
   type        = number
-  default     = 1
+  default     = 3
 }
 
 variable "redis_rediscluster_slave_count" {
