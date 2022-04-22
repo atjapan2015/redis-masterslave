@@ -46,7 +46,7 @@ resource "null_resource" "redis_replica_start_redis_rediscluster" {
       "sudo systemctl status redis.service",
       "echo '=== Started REDIS on redis${count.index + var.redis_rediscluster_shared_count} node... ==='",
       "echo '=== Register REDIS Exporter to Prometheus... ==='",
-      "curl -X GET http://${var.prometheus_server}:${var.prometheus_port}/prometheus/targets/add/${data.oci_core_vnic.redis_replica_vnic[count.index].hostname_label}_${var.redis_exporter_port}}"
+      "curl -X GET http://${var.prometheus_server}:${var.prometheus_port}/prometheus/targets/add/${data.oci_core_vnic.redis_replica_vnic[count.index].hostname_label}_${var.redis_exporter_port}"
     ]
   }
 }

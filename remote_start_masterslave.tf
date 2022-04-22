@@ -48,7 +48,7 @@ resource "null_resource" "redis_replica_start_redis_masterslave" {
       "sudo systemctl status redis.service",
       "echo '=== Started REDIS on redis${count.index + var.redis_masterslave_master_count} node... ==='",
       "echo '=== Register REDIS Exporter to Prometheus... ==='",
-      "curl -X GET http://${var.prometheus_server}:${var.prometheus_port}/prometheus/targets/add/${data.oci_core_vnic.redis_replica_vnic[count.index].hostname_label}_${var.redis_exporter_port}}",
+      "curl -X GET http://${var.prometheus_server}:${var.prometheus_port}/prometheus/targets/add/${data.oci_core_vnic.redis_replica_vnic[count.index].hostname_label}_${var.redis_exporter_port}",
       "echo '=== Register REDIS Datasource to Redis Insight... ==='",
       "curl -d '{\"name\":\"${data.oci_core_vnic.redis_replica_vnic[count.index].hostname_label}.${var.redis_prefix}\",\"connectionType\":\"STANDALONE\",\"host\":\"${data.oci_core_vnic.redis_replica_vnic[count.index].private_ip_address}\",\"port\":${var.redis_port1},\"password\":\"${random_string.redis_password.result}\"}' -H \"Content-Type: application/json\" -X POST http://${var.redis_insight_server}:${var.redis_insight_port}/api/instance/"
     ]
